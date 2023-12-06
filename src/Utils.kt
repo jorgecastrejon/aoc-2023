@@ -19,3 +19,22 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
+
+inline fun <T: Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
+    val root = mutableListOf<MutableList<T>>()
+    var current = mutableListOf<T>()
+
+    for (i in this) {
+        if (func(i)) {
+            root.add(current)
+            current = mutableListOf()
+        } else {
+            current.add(i)
+        }
+    }
+    if (current.isNotEmpty()) {
+        root.add(current)
+    }
+
+    return root
+}
