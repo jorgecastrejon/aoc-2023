@@ -20,7 +20,7 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  */
 fun Any?.println() = println(this)
 
-inline fun <T: Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
+inline fun <T : Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
     val root = mutableListOf<MutableList<T>>()
     var current = mutableListOf<T>()
 
@@ -38,3 +38,17 @@ inline fun <T: Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
 
     return root
 }
+
+fun gcd(a: Long, b: Long): Long {
+    var n1 = a
+    var n2 = b
+
+    while (n1 != n2) {
+        if (n1 > n2) n1 -= n2 else n2 -= n1
+    }
+
+    return n1
+}
+
+fun lcm(a: Long, b: Long): Long = (a * b) / gcd(a, b)
+fun lcm(list: List<Long>) = list.reduce { acc, n -> lcm(acc, n) }
