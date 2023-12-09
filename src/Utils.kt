@@ -20,6 +20,8 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  */
 fun Any?.println() = println(this)
 
+fun String.splitAsInt(separator: String = " "): List<Int> = split(separator).map(String::toInt)
+
 inline fun <T : Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
     val root = mutableListOf<MutableList<T>>()
     var current = mutableListOf<T>()
