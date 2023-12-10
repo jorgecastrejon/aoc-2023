@@ -1,70 +1,17 @@
-import kotlin.math.min
-
 fun main() {
 
     fun part1(input: List<String>): Int {
-        val stack = ArrayDeque<Grid.Point>()
-        val visited: MutableSet<Grid.Point> = mutableSetOf()
-        val distance: MutableMap<Grid.Point, Int> = mutableMapOf()
-
         val grid = Grid(input)
         val start = grid.cells.toList().first { (_, string) -> string == "S" }.first
-        stack.add(start)
-        distance[start] = 0
+        val loop = getLoopFrom(grid, start = start)
 
-        while (stack.isNotEmpty()) {
-            val point = stack.removeFirst()
-
-            if (!visited.contains(point)) {
-                visited.add(point)
-                point.directions()
-                    .filter { (neighbor, direction) ->
-                        grid.cells[point].couldMoveTo(direction) && direction.wouldReach(grid.cells[neighbor])
-                    }
-                    .forEach { (neighbor, _) ->
-                        stack.add(neighbor)
-                        distance[neighbor] =
-                            min(distance.getOrDefault(neighbor, Int.MAX_VALUE), distance.getValue(point) + 1)
-                    }
-            }
-        }
-
-        return distance.maxOf { (_, value) -> value }
+        return if (loop.size % 2 == 0) loop.size / 2 else (loop.size / 2) + 1
     }
 
     fun part2(input: List<String>): Int {
-        val stack = ArrayDeque<Grid.Point>()
-        val loop = ArrayDeque<Grid.Point>()
-        val visited: MutableSet<Grid.Point> = mutableSetOf()
-
         val grid = Grid(input)
         val start = grid.cells.toList().first { (_, string) -> string == "S" }.first
-        stack.add(start)
-
-        while (stack.isNotEmpty()) {
-            val point = stack.removeFirst()
-
-            if (!visited.contains(point)) {
-                loop.add(point)
-                visited.add(point)
-
-                val next = point.directions().filter { (neighbor, direction) ->
-                    grid.cells[point].couldMoveTo(direction) && direction.wouldReach(grid.cells[neighbor])
-                }.firstOrNull { (neighbor, _) -> !visited.contains(neighbor) }
-
-                if (next != null) {
-                    stack.add(next.first)
-                } else {
-                    if (point.directions().any { (neighbor, _) -> neighbor == start }) {
-                        break
-                    }
-                    loop.remove(point)
-                    val latest = loop.removeLast()
-                    visited.remove(latest)
-                    stack.add(latest)
-                }
-            }
-        }
+        val loop = getLoopFrom(grid, start = start)
         var inside: Boolean
         val innerPoints = mutableSetOf<Grid.Point>()
 
@@ -90,6 +37,40 @@ fun main() {
     val input = readInput("Day10")
     part1(input).println()
     part2(input).println()
+}
+
+private fun getLoopFrom(grid: Grid, start: Grid.Point): ArrayDeque<Grid.Point> {
+    val stack = ArrayDeque<Grid.Point>()
+    val loop = ArrayDeque<Grid.Point>()
+    val visited: MutableSet<Grid.Point> = mutableSetOf()
+    stack.add(start)
+
+    while (stack.isNotEmpty()) {
+        val point = stack.removeFirst()
+
+        if (!visited.contains(point)) {
+            loop.add(point)
+            visited.add(point)
+
+            val next = point.directions().filter { (neighbor, direction) ->
+                grid.cells[point].couldMoveTo(direction) && direction.wouldReach(grid.cells[neighbor])
+            }.firstOrNull { (neighbor, _) -> !visited.contains(neighbor) }
+
+            if (next != null) {
+                stack.add(next.first)
+            } else {
+                if (point.directions().any { (neighbor, _) -> neighbor == start }) {
+                    break
+                }
+                loop.remove(point)
+                val latest = loop.removeLast()
+                visited.remove(latest)
+                stack.add(latest)
+            }
+        }
+    }
+
+    return loop
 }
 
 private fun String?.couldMoveTo(direction: Grid.Direction): Boolean =
