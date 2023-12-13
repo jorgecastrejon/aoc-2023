@@ -41,6 +41,18 @@ inline fun <T : Any> List<T>.windowedBy(func: (T) -> Boolean): List<List<T>> {
     return root
 }
 
+fun <T> List<List<T>>.transposed(): List<List<T>> =
+    first().indices.map { x ->
+        indices.map { y ->
+            this[y][x]
+        }
+    }
+
+fun <T, V> List<List<T>>.transposed(transform: (a: List<T>) -> V): List<V> =
+    first().indices.map { x ->
+        transform(indices.map { y -> this[y][x] })
+    }
+
 fun gcd(a: Long, b: Long): Long {
     var n1 = a
     var n2 = b
