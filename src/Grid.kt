@@ -17,6 +17,14 @@ class Grid(val input: List<String>) {
             Point(x = x, y = y + 1) to Direction.Down,
             Point(x = x - 1, y = y) to Direction.Left,
         )
+
+        fun move(direction: Direction): Point =
+            when (direction) {
+                Direction.Up -> Point(x = x, y = y - 1)
+                Direction.Right -> Point(x = x + 1, y = y)
+                Direction.Down -> Point(x = x, y = y + 1)
+                Direction.Left -> Point(x = x - 1, y = y)
+            }
     }
 
     enum class Direction {
